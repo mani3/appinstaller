@@ -16,12 +16,13 @@ class Ipa(Base):
 
     __tablename__ = 'ipa'
 
-    app_id      = db.Column(db.Integer)
     ipa_name    = db.Column(db.String(128))
     ipa_uri     = db.Column(db.String(512))
     bundle_id   = db.Column(db.String(128))
     app_version = db.Column(db.String(64))
     app_name    = db.Column(db.String(128))
+
+    app_id      = db.Column(db.Integer, db.ForeignKey('app.id'), nullable = False)
 
     def __init__(self, app_id, ipa_name, ipa_uri, bundle_id = '', app_version = '', app_name = ''):
         self.app_id = app_id

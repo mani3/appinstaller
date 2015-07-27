@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>App</h2>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form class="form-inline" action="{{ url_for('app.create') }}" method="post">
+    <dl>
+      <dd><input type=text name="name">
+      <dd>
+      <select id="platform" name="platform">
+        <option value="ios">iOS</option>
+        <option value="android">Android</option>
+      </select>
+      <dd><input type=submit>
+    </dl>
+  </form>
+Hello World
+
+{% endblock %}
+
