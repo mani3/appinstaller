@@ -30,6 +30,8 @@ ${ENV_NAME}/bin/pip install flask
 ${ENV_NAME}/bin/pip install flask-sqlalchemy
 ${ENV_NAME}/bin/pip install flask-wtf
 ${ENV_NAME}/bin/pip install gunicorn
+${ENV_NAME}/bin/pip install pytz
+${ENV_NAME}/bin/pip install biplist
 
 # Cleanup
 rm ez_setup.py* virtualenv.py* setuptools*.zip
