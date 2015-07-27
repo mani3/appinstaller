@@ -63,6 +63,7 @@ target/
 flask/
 *.db
 *.DS_Store
+uploaded_ipa/
 
 ### Vim ###
 [._]*.s[a-w][a-z]
