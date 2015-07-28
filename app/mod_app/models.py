@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import os
+from datetime import datetime
 from app import db
 
 class App(db.Model):
@@ -10,11 +11,8 @@ class App(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     platform = db.Column(db.String(64))
-    created_at = db.Column(db.DateTime, \
-        default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, \
-        default=db.func.currnet_timestamp(), \
-        onupdate=db.func.current_timestamp())
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now())
 
     def __init__(self, name = '', platform = ''):
         self.name = name

@@ -11,7 +11,8 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
 DATABASE_CONNECT_OPTIONS = {}
 
 # Uploaded the ipa file directory
-UPLOADED_IPA_DIR = 'uploaded_ipa'
+UPLOADED_IPA_DIR = 'app/static/uploaded_ipa'
 
-
+# Path prefix
+URL_PREFIX = '/appinstall'
 

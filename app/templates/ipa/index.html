@@ -1,14 +1,40 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>IPA</h2>
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-    <span class="sr-only">Error:</span>
-    {{ error }}
+<h2>IPA</h2>
+<form class="form-horizontal" name="selection_app">
+  <div class="form-group">
+    <label for="selection_app" class="col-sm-2 control-label">App</label>
+    <div class="col-sm-10">
+      <select name="app_id" id="selection_app" class="form-control" onchange="selected()">
+        <option>Select app..</option>
+        {% for app in app_list %}
+        <option value="{{ url_for('ipa.index', app_id=app.id) }}">{{ app.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
   </div>
-  {% endif %}
-
-  
+</form>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>App</th>
+    <th>Version</th>
+    <th>Date</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for ipa in ipa_list %}
+  <tr>
+    <th scope="row">{{ ipa.id }}</th>
+    <th>{{ ipa.ipa_name }}</th>
+    <th>{{ ipa.app_version }}</th>
+    <th>{{ ipa.created_at|datetime_fmt }}</th>
+    <th><a class="btn btn-primary" href="{{ ipa.plist_uri }}">Install</a></th>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

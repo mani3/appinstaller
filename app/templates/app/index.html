@@ -1,26 +1,51 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>App</h2>
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-    <span class="sr-only">Error:</span>
-    {{ error }}
+<h2>App</h2>
+<form class="form-horizontal" action="{{ url_for('app.create') }}" method="post">
+  <div class="form-group">
+    <label for="inputAppName" class="col-sm-2 control-label">App Name</label>
+    <div class="col-sm-10">
+      <input type="text" name="app_name" class="form-control" id="inputAppName" placeholder="e.g. GeymuGetRich-iOS">
+    </div>
   </div>
-  {% endif %}
-
-  <form class="form-inline" action="{{ url_for('app.create') }}" method="post">
-    <dl>
-      <dd><input type=text name="name">
-      <dd>
-      <select id="platform" name="platform">
+  <div class="form-group">
+    <label for="platform" class="col-sm-2 control-label">Platform</label>
+    <div class="col-sm-10">
+      <select id="platform" class="form-control" name="platform">
         <option value="ios">iOS</option>
         <option value="android">Android</option>
       </select>
-      <dd><input type=submit>
-    </dl>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary">Register</button>
+    </div>
+  </div>
+</form>
+<h2>Registered App</h2>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>App name</th>
+    <th>Date</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for app in app_list %}
+  <form action="{{ url_for('app.delete', id=app.id) }}" method="post">
+    <input type="hidden" name="_method" value="DELETE" />
+    <tr>
+      <th scope="row">{{ app.id }}</th>
+      <th>{{ app.name }}</th>
+      <th>{{ app.created_at|datetime_fmt }}</th>
+      <th><button type="submit" class="btn btn-danger">Delete</button></th>
+    </tr>
   </form>
-Hello World
-
+  {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
 

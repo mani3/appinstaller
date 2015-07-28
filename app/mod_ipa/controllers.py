@@ -1,28 +1,39 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os, sys
+import os, sys, shutil
 import zipfile
 import biplist
 import pytz
+import urlparse
 
 from flask import Blueprint, Flask, url_for, request, render_template, \
                   redirect, escape, Markup, make_response, send_file, \
                   Response, flash, g, jsonify
 from werkzeug import secure_filename
 from datetime import datetime, date, timedelta
+from jinja2 import Environment, FileSystemLoader
 
 from app import app, db
 from app.mod_ipa.models import Ipa
+from app.mod_app.models import App
 
-mod_ipa = Blueprint('ipa', __name__, url_prefix='/ipa')
+mod_ipa = Blueprint('ipa', __name__, url_prefix = app.config['URL_PREFIX'] + '/ipa')
 
-@mod_ipa.route('/index/', methods=['GET'])
-def index():
-    return render_template('ipa/index.html')
+@mod_ipa.route('/', methods=['GET'])
+@mod_ipa.route('/<int:app_id>', methods=['GET'])
+def index(app_id=None):
+    error = None
+    applist = App.query.all()
+    ipalist = []
+    if app_id:
+        ipalist = Ipa.query.filter_by(app_id=app_id).all()
 
-@mod_ipa.route('/create/', methods=['POST'])
-def create():
+    return render_template('ipa/index.html', error=error, \
+        app_list=applist, ipa_list=ipalist)
+
+@mod_ipa.route('/<int:app_id>', methods=['POST'])
+def create(app_id):
     error = None
     if request.method == 'POST':
         file = request.files['file']
@@ -36,9 +47,16 @@ def create():
                 os.makedirs(path)
             filepath = os.path.join(path, filename)
             file.save(filepath)
+            bundle_id, display_name, build_version, app_version, error_list = ipa_attribute(filepath, path)
+            plist_path = install_plist(filepath, request.url_root, bundle_id, app_version, display_name)
 
-            ipa_attribute(filepath, path)
-   
+            print request.url_root
+
+            ipa = Ipa(app_id, filename, filepath, bundle_id, app_version, build_version, display_name, plist_path)
+            ipa.plist_uri = ipa.download_url(request.url_root)
+            db.session.add(ipa)
+            db.session.commit()
+
             response = { 'status': 1 }
         else:
             response = { 'status': 2 }
@@ -90,6 +108,10 @@ def ipa_attribute(ipa_path, working_dir):
             app_version = plist(path, 'CFBundleShortVersionString')
         else:
             error_list.append('Not found Info.plist')
+        try:
+            shutil.rmtree(os.path.join(working_dir, unarchive_name))
+        except IOError, e:
+            pass
     return (bundle_id, display_name, build_version, app_version, error_list)
 
 def plist(filepath, key):
@@ -105,4 +127,30 @@ def plist(filepath, key):
         value = plist[key]
     return value
 
+def install_plist(ipa_file, hostname, bundle_id, app_version, display_name):
+    filename = os.path.basename(ipa_file)
+    ipa_dir = os.path.dirname(ipa_file)
+    templates_path = os.path.join(app.config['BASE_DIR'], "app/templates/")
+    env = Environment(loader=FileSystemLoader(templates_path, encoding='utf-8'))
+    template = env.get_template('install.plist')
+
+    upload_dir = os.path.join(app.config['URL_PREFIX'], '/'.join(ipa_dir.split('/')[1:]))
+    download_path = os.path.join(upload_dir, filename)
+    download_url = urlparse.urljoin(hostname, download_path)
+
+    if display_name is None:
+        display_name = filename
+
+    renderer = {
+        'download_url': download_url,
+        'bundle_id': bundle_id,
+        'app_version': app_version,
+        'display_name': display_name
+        }
+    plist = template.render(renderer)
+    plist_path = os.path.join(ipa_dir, 'install.plist')
+    f = open(plist_path, 'w')
+    f.write(plist)
+    f.close
+    return plist_path
 
