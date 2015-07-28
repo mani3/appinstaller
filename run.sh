@@ -16,9 +16,16 @@ if [ ! -d "${LOG_DIR}" ]; then
 fi
 
 source ${ENV_DIR}/bin/activate
+
+# Run migration
+python manage.py db migrate -m "`date '+%Y%m%d%H%M'`"
+python manage.py db show
+python manage.py db upgrade
+
 gunicorn -b 127.0.0.1:4000 app:app \
 --error-logfile "${ERROR_LOG}" \
 --access-logfile "${ACCESS_LOG}" \
 --timeout 600
+
 deactivate
 

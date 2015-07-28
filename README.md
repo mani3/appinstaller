@@ -30,4 +30,15 @@ $ gunicorn -b 127.0.0.1:4000 app:app
 $ ./create-crt.sh
 ```
 
+### Sqlite3 migration
 
+```
+// dbのマイグレーションを行うための初期化(実行済み)
+$ python manage.py db init
+
+// モデルデータを更新後、実行するとマイグレーションファイルが生成される
+$ python manage.py db migrate -m "コメント"
+
+// マイグレーションファイルをdbに反映する
+$ python manage.py db upgrade
+```
