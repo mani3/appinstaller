@@ -26,12 +26,7 @@ ${ENV_NAME}/bin/python ez_setup.py
 ${ENV_NAME}/bin/easy_install pip
 
 # Install flask
-${ENV_NAME}/bin/pip install flask
-${ENV_NAME}/bin/pip install flask-sqlalchemy
-${ENV_NAME}/bin/pip install flask-wtf
-${ENV_NAME}/bin/pip install gunicorn
-${ENV_NAME}/bin/pip install pytz
-${ENV_NAME}/bin/pip install biplist
+${ENV_NAME}/bin/pip install -r requirements.txt
 
 # Cleanup
 rm ez_setup.py* virtualenv.py* setuptools*.zip
