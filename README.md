@@ -16,9 +16,18 @@ $ source flask/bin/activate
 //$ deactivate
 ``` 
 
+### gunicorn
+
+- Run standalone app
+
+```
+$ gunicorn -b 127.0.0.1:4000 app:app
+```
+
 ### Create my self signed certification
 
 ```
 $ ./create-crt.sh
 ```
+
 
