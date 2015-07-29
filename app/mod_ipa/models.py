@@ -12,8 +12,8 @@ class Base(db.Model):
     __abstract__  = True
 
     id         = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.now())
-    updated_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=db.func.localtimestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.localtimestamp())
 
 class Ipa(Base):
 
@@ -45,7 +45,7 @@ class Ipa(Base):
     def remove_ipa(self):
         try:
             os.remove(self.ipa_uri)
-            os.remove(self.plist_uri)
+            shutil.rmtree(os.path.dirname(self.ipa_uri))
         except OSError, e:
             app.logger.error(e)
             pass

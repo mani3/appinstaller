@@ -29,7 +29,7 @@
   <tr>
     <th scope="row">{{ ipa.id }}</th>
     <th>{{ ipa.ipa_name }}</th>
-    <th>{{ ipa.app_version }}</th>
+    <th>{{ ipa.app_version }} ({{ ipa.build_version }})</th>
     <th>{{ ipa.created_at|datetime_fmt }}</th>
     <th><a class="btn btn-primary" href="{{ ipa.plist_uri }}">Install</a></th>
   </tr>

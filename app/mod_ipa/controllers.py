@@ -27,7 +27,7 @@ def index(app_id=None):
     applist = App.query.all()
     ipalist = []
     if app_id:
-        ipalist = Ipa.query.filter_by(app_id=app_id).all()
+        ipalist = Ipa.query.filter_by(app_id=app_id).order_by(Ipa.created_at.desc()).all()
 
     return render_template('ipa/index.html', error=error, \
         app_list=applist, ipa_list=ipalist)
@@ -57,6 +57,20 @@ def create(app_id):
             db.session.add(ipa)
             db.session.commit()
 
+            '''
+            old_ipalist = Ipa.query.filter_by(app_id=app_id).order_by(Ipa.created_at.desc()).limit(21).all()
+            old_ipa = None
+            if len(old_ipalist) > 20:
+                old_ipa = old_ipalist[-1]
+            print old_ipa
+            if old_ipa:
+                ipalist = Ipa.query.filter(Ipa.app_id == app_id, Ipa.created_at < old_ipa.created_at).all()
+                print ipalist
+                for ipa in ipalist:
+                    ipa.remove_ipa()
+                    db.session.delete(ipa)
+                db.session.commit()
+            '''
             response = { 'status': 1 }
         else:
             response = { 'status': 2 }

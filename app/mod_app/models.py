@@ -11,8 +11,8 @@ class App(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     platform = db.Column(db.String(64))
-    created_at = db.Column(db.DateTime, default=datetime.now())
-    updated_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=db.func.localtimestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.localtimestamp())
 
     def __init__(self, name = '', platform = ''):
         self.name = name
