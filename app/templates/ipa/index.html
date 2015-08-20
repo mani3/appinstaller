@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
 <h2>IPA</h2>
+<div class="alert alert-warning" role="alert">
+  <p>アプリをインストールする前に証明書をインストールする必要があります</p>
+  <p>証明書は<a href="http://192.168.1.2/server.crt">ここ</a>からインストールできます</p>
+</div>
 <form class="form-horizontal" name="selection_app">
   <div class="form-group">
     <label for="selection_app" class="col-sm-2 control-label">App</label>
@@ -22,6 +26,7 @@
     <th>Version</th>
     <th>Date</th>
     <th></th>
+    <th></th>
   </tr>
   </thead>
   <tbody>
@@ -32,6 +37,7 @@
     <th>{{ ipa.app_version }} ({{ ipa.build_version }})</th>
     <th>{{ ipa.created_at|datetime_fmt }}</th>
     <th><a class="btn btn-primary" href="{{ ipa.plist_uri }}">Install</a></th>
+    <th><a class="btn btn-success" href="{{ ipa.ipa_uri }}" download="{{ ipa.ipa_name }}">Download</a></th>
   </tr>
   {% endfor %}
   </tbody>

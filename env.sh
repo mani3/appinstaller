@@ -12,7 +12,8 @@ ENV_NAME=$1
 VIRTUALENV="virtualenv-1.10.1"
 
 # Download ez_setup.py
-wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+#wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+curl -O https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
 
 # Download virtualenv
 curl -O https://pypi.python.org/packages/source/v/virtualenv/${VIRTUALENV}.tar.gz
