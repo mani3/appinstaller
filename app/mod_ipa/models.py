@@ -6,6 +6,8 @@ import zipfile
 import biplist
 import urlparse
 
+import axmlparserpy.apk as apk
+
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 from app import app, db
@@ -149,3 +151,47 @@ class Ipa(Base):
         f.write(plist)
         f.close
         return plist_path
+
+class Apk(Base):
+
+    __tablename__ = "apk"
+
+    apk_name      = db.Column(db.String(128))
+    apk_uri       = db.Column(db.String(512))
+    package_name  = db.Column(db.String(128))
+    version_name  = db.Column(db.String(64))
+    version_code  = db.Column(db.Integer)
+    app_name      = db.Column(db.String(128))
+    download_url  = db.Column(db.String(512))
+
+    app_id        = db.Column(db.Integer, db.ForeignKey('app.id'), nullable = False)
+
+    def __init__(self, app_id, apk_name, apk_uri, url_root):
+        app_apk = apk.APK(apk_uri)
+        self.app_id = app_id
+        self.apk_name = apk_name
+        self.apk_uri = apk_uri
+
+        self.package_name = app_apk.get_package()
+        self.version_name = app_apk.get_androidversion_name()
+        self.version_code = app_apk.get_androidversion_code()
+        self.app_name = app_apk.get_filename()
+        self.download_url = self.generate_download_url(url_root)
+
+    def __repr__(self):
+        return '<%s(%r, %r)>' % (self.__class__.__name__, self.id, self.apk_name)
+
+    def remove_apk(self):
+        try:
+            os.remove(self.apk_uri)
+            shutil.rmtree(os.path.dirname(self.apk_uri))
+        except OSError, e:
+            app.logger.error(e)
+            pass
+
+    def generate_download_url(self, url_root):
+        apk_path = '/'.join(self.apk_uri.split('/')[1:])
+        apk_path = app.config['URL_PREFIX'] + '/' + apk_path
+        apk_url = urlparse.urljoin(url_root, apk_path)
+        return apk_url
+
