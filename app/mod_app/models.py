@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
-from datetime import datetime
 from app import db
+
 
 class App(db.Model):
     __tablename__ = 'app'
@@ -14,10 +13,9 @@ class App(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.localtimestamp())
     updated_at = db.Column(db.DateTime, default=db.func.localtimestamp())
 
-    def __init__(self, name = '', platform = ''):
+    def __init__(self, name='', platform=''):
         self.name = name
         self.platform = platform
 
     def __repr__(self):
         return '<%s(%r, %r)>' % (self.__class__.__name__, self.id, self.name)
-

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os, sys, shutil
+import os
+import shutil
 import zipfile
 import biplist
 import urlparse
@@ -9,34 +10,37 @@ import urlparse
 import axmlparserpy.apk as apk
 
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
 from app import app, db
 
-class Base(db.Model):
-    __abstract__  = True
 
-    id         = db.Column(db.Integer, primary_key=True)
+class Base(db.Model):
+    __abstract__ = True
+
+    id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=db.func.localtimestamp())
     updated_at = db.Column(db.DateTime, default=db.func.localtimestamp())
+
 
 class Ipa(Base):
 
     __tablename__ = 'ipa'
 
-    ipa_name      = db.Column(db.String(128))
-    ipa_uri       = db.Column(db.String(512))
-    bundle_id     = db.Column(db.String(128))
-    app_version   = db.Column(db.String(64))
+    ipa_name = db.Column(db.String(128))
+    ipa_uri = db.Column(db.String(512))
+    bundle_id = db.Column(db.String(128))
+    app_version = db.Column(db.String(64))
     build_version = db.Column(db.String(64))
-    app_name      = db.Column(db.String(128))
-    plist_uri     = db.Column(db.String(512))
+    app_name = db.Column(db.String(128))
+    plist_uri = db.Column(db.String(512))
 
-    app_id        = db.Column(db.Integer, db.ForeignKey('app.id'), nullable = False)
+    app_id = db.Column(db.Integer, db.ForeignKey('app.id'), nullable=False)
 
     def __init__(self, app_id, ipa_name, ipa_uri, url_root):
         working_dir = os.path.dirname(ipa_uri)
-        bundle_id, display_name, build_version, app_version, error_list = self.ipa_attribute(ipa_uri, working_dir)
-        plist_path = self.install_plist(ipa_uri, url_root, bundle_id, app_version, display_name)
+        bundle_id, display_name, build_version, app_version, error_list = self.ipa_attribute(
+            ipa_uri, working_dir)
+        plist_path = self.install_plist(
+            ipa_uri, url_root, bundle_id, app_version, display_name)
 
         self.app_id = app_id
         self.ipa_name = ipa_name
@@ -47,7 +51,7 @@ class Ipa(Base):
         self.app_name = display_name
         self.plist_uri = plist_path
         self.plist_uri = self.download_url(url_root)
-    
+
     def __repr__(self):
         return '<%s(%r, %r)>' % (self.__class__.__name__, self.id, self.ipa_name)
 
@@ -65,7 +69,8 @@ class Ipa(Base):
         url_root = url_root.replace('http://', 'https://')
         plist_url = urlparse.urljoin(url_root, plist_path)
         print plist_url
-        url = 'itms-services://?action=download-manifest&url={0}'.format(plist_url)
+        url = 'itms-services://?action=download-manifest&url={0}'.format(
+            plist_url)
         return url
 
     def find(self, name, path):
@@ -102,12 +107,13 @@ class Ipa(Base):
         except IOError, e:
             if os.path.exists(working_dir):
                 shutil.rmtree(working_dir)
-            error_list.append('Can not unarchive %s.' % filename)
+            error_list.append('Can not unarchive %s.' % ipa_path)
             pass
 
         if not unarchive_name is None:
             print unarchive_name
-            path = self.find('Info.plist', os.path.join(working_dir, unarchive_name))
+            path = self.find(
+                'Info.plist', os.path.join(working_dir, unarchive_name))
             if not path is None:
                 bundle_id = self.plist(path, 'CFBundleIdentifier')
                 display_name = self.plist(path, 'CFBundleDisplayName')
@@ -129,10 +135,12 @@ class Ipa(Base):
         filename = os.path.basename(ipa_file)
         ipa_dir = os.path.dirname(ipa_file)
         templates_path = os.path.join(app.config['BASE_DIR'], "app/templates/")
-        env = Environment(loader=FileSystemLoader(templates_path, encoding='utf-8'))
+        env = Environment(
+            loader=FileSystemLoader(templates_path, encoding='utf-8'))
         template = env.get_template('install.plist')
 
-        upload_dir = os.path.join(app.config['URL_PREFIX'], '/'.join(ipa_dir.split('/')[1:]))
+        upload_dir = os.path.join(
+            app.config['URL_PREFIX'], '/'.join(ipa_dir.split('/')[1:]))
         download_path = os.path.join(upload_dir, filename)
         download_url = urlparse.urljoin(hostname, download_path)
 
@@ -144,7 +152,7 @@ class Ipa(Base):
             'bundle_id': bundle_id,
             'app_version': app_version,
             'display_name': display_name
-            }
+        }
         plist = template.render(renderer)
         plist_path = os.path.join(ipa_dir, 'install.plist')
         f = open(plist_path, 'w')
@@ -152,19 +160,20 @@ class Ipa(Base):
         f.close
         return plist_path
 
+
 class Apk(Base):
 
     __tablename__ = "apk"
 
-    apk_name      = db.Column(db.String(128))
-    apk_uri       = db.Column(db.String(512))
-    package_name  = db.Column(db.String(128))
-    version_name  = db.Column(db.String(64))
-    version_code  = db.Column(db.Integer)
-    app_name      = db.Column(db.String(128))
-    download_url  = db.Column(db.String(512))
+    apk_name = db.Column(db.String(128))
+    apk_uri = db.Column(db.String(512))
+    package_name = db.Column(db.String(128))
+    version_name = db.Column(db.String(64))
+    version_code = db.Column(db.Integer)
+    app_name = db.Column(db.String(128))
+    download_url = db.Column(db.String(512))
 
-    app_id        = db.Column(db.Integer, db.ForeignKey('app.id'), nullable = False)
+    app_id = db.Column(db.Integer, db.ForeignKey('app.id'), nullable=False)
 
     def __init__(self, app_id, apk_name, apk_uri, url_root):
         app_apk = apk.APK(apk_uri)
@@ -194,4 +203,3 @@ class Apk(Base):
         apk_path = app.config['URL_PREFIX'] + '/' + apk_path
         apk_url = urlparse.urljoin(url_root, apk_path)
         return apk_url
-

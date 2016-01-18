@@ -1,4 +1,4 @@
-# App install
+# App installer
 
 - Mac OSX
 
@@ -27,7 +27,7 @@ $ gunicorn -b 127.0.0.1:4000 app:app
 ### Sqlite3 migration
 
 ```
-// dbのマイグレーションを行うための初期化(実行済み)
+// dbのマイグレーションを行うための初期化
 $ python manage.py db init
 
 // モデルデータを更新後、実行するとマイグレーションファイルが生成される
@@ -46,8 +46,8 @@ $ sudo vim /etc/apache2/users/<user name>.conf
 ```
 
 ```
-ProxyPass /appinstall http://localhost:4000/appinstall nocanon
-ProxyPassReverse /appinstall http://localhost:4000/appinstall
+ProxyPass /appinstaller http://localhost:4000/appinstaller nocanon
+ProxyPassReverse /appinstaller http://localhost:4000/appinstaller
 ProxyRequests Off
 AllowEncodedSlashes NoDecode
 ```
@@ -85,7 +85,7 @@ $ sudo apachectl restart
 
 ```
 $ ./create-crt.sh
-$ tree -L 2 cer                                                                                      10:41:59  ☁  master ☂ ✭
+$ tree -L 2 cer
 cer
 ├── myself-server.cer
 ├── myself-server.key
@@ -97,6 +97,5 @@ cer
 ```
 $ sudo cp myself-server.key /private/etc/apache2/server.key
 $ sudo cp server.crt /private/etc/apache2/server.crt
-$ sudo ln -sf server.crt /Library/WebServer/Documents/
 ```
 

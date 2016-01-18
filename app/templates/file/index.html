@@ -12,7 +12,7 @@
       <select name="app_id" id="selection_app" class="form-control" onchange="selected()">
         <option>Select app..</option>
         {% for app in app_list %}
-        <option value="{{ url_for('ipa.index', app_id=app.id) }}">{{ app.name }}</option>
+        <option value="{{ url_for('file.index', app_id=app.id) }}">{{ app.name }}</option>
         {% endfor %}
       </select>
     </div>

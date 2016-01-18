@@ -4,7 +4,7 @@ DEBUG = True
 
 # Define the application directory
 import os
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # Define the database for SQLite
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
@@ -14,5 +14,4 @@ DATABASE_CONNECT_OPTIONS = {}
 UPLOADED_IPA_DIR = 'app/static/uploaded_ipa'
 
 # Path prefix
-URL_PREFIX = '/appinstall'
-
+URL_PREFIX = '/appinstaller'

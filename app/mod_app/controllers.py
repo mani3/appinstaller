@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os, sys
-
-from flask import Blueprint, Flask, url_for, render_template, \
-                  request, redirect
+from flask import Blueprint, url_for, render_template, request, redirect
 
 from app import app, db
 from app.mod_app.models import App
 
-mod_app = Blueprint('app', __name__, url_prefix=app.config['URL_PREFIX'] + '/app')
+mod_app = Blueprint(
+    'app', __name__, url_prefix=app.config['URL_PREFIX'] + '/app')
+
 
 @mod_app.route('/', methods=['GET'])
 def index():
     error = request.args.get('error', default=None)
     applist = App.query.all()
     return render_template('app/index.html', error=error, app_list=applist)
+
 
 @mod_app.route('/', methods=['POST'])
 def create():
@@ -26,6 +26,7 @@ def create():
     db.session.add(app)
     db.session.commit()
     return redirect(url_for('app.index', error=error))
+
 
 @mod_app.route('/<int:id>', methods=['POST'])
 def delete(id):
