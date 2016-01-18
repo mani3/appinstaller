@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <h2>IPA</h2>
+{% if app_list|length > 0 %}
 <div class="alert alert-warning" role="alert">
   <p>アプリをインストールする前に証明書をインストールする必要があります</p>
   <p>証明書は<a href="{{ url_for('static', filename='server.crt') }}">ここ</a>からインストールできます</p>
@@ -18,6 +19,25 @@
     </div>
   </div>
 </form>
+{% else %}
+<h3>Usage</h3>
+<ol>
+<li><a href="{{ url_for('app.index') }}">アプリ登録</a>を行う</li>
+<li>登録したアプリIDに応じてIPAファイルまたはAPKファイルをアップロードする
+<pre>
+POST /appinstaller/file/&lt;app_id&gt;
+Content-Type: multipart/form-data; boundary=foo_bar_baz
+
+File data
+</pre>
+サンプル
+<pre>
+$ curl -F file=@sample.ipa http://{{ hostname }}/appinstaller/file/1
+</pre>
+</li>
+<li>モバイルブラウザからこのページを開く</li>
+</ol>
+{% endif %}
 <table class="table table-striped">
   <thead>
   <tr>

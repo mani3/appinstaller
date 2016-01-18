@@ -21,6 +21,7 @@ mod_file = Blueprint(
 def index(app_id=None):
     error = None
     ua = request.headers.get('User-Agent')
+    host = request.headers.get('Host')
     applist = App.query.all()
     ipalist = []
     apklist = []
@@ -31,7 +32,7 @@ def index(app_id=None):
             Apk.created_at.desc()).all()
 
     return render_template('file/index.html', error=error,
-                           app_list=applist, ipa_list=ipalist, apk_list=apklist, is_mobile=is_mobile(ua))
+                           app_list=applist, ipa_list=ipalist, apk_list=apklist, is_mobile=is_mobile(ua), hostname=host)
 
 
 @mod_file.route('/<int:app_id>', methods=['POST'])
