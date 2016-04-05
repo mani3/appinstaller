@@ -156,7 +156,7 @@ class Ipa(Base):
         plist = template.render(renderer)
         plist_path = os.path.join(ipa_dir, 'install.plist')
         f = open(plist_path, 'w')
-        f.write(plist)
+        f.write(plist.encode('utf-8'))
         f.close
         return plist_path
 
