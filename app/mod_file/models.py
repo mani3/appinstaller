@@ -53,7 +53,8 @@ class Ipa(Base):
         self.plist_uri = self.download_url(url_root)
 
     def __repr__(self):
-        return '<%s(%r, %r)>' % (self.__class__.__name__, self.id, self.ipa_name)
+        return '<%s(%r, %r)>' % (
+            self.__class__.__name__, self.id, self.ipa_name)
 
     def remove_ipa(self):
         try:
@@ -68,7 +69,6 @@ class Ipa(Base):
         plist_path = app.config['URL_PREFIX'] + '/' + plist_path
         url_root = url_root.replace('http://', 'https://')
         plist_url = urlparse.urljoin(url_root, plist_path)
-        print plist_url
         url = 'itms-services://?action=download-manifest&url={0}'.format(
             plist_url)
         return url
@@ -80,7 +80,6 @@ class Ipa(Base):
 
     def plist(self, filepath, key):
         try:
-            print filepath
             plist = biplist.readPlist(os.path.expanduser(filepath))
         except IOError, e:
             app.logger.error(e)
@@ -110,11 +109,10 @@ class Ipa(Base):
             error_list.append('Can not unarchive %s.' % ipa_path)
             pass
 
-        if not unarchive_name is None:
-            print unarchive_name
+        if unarchive_name is not None:
             path = self.find(
                 'Info.plist', os.path.join(working_dir, unarchive_name))
-            if not path is None:
+            if path is not None:
                 bundle_id = self.plist(path, 'CFBundleIdentifier')
                 display_name = self.plist(path, 'CFBundleDisplayName')
                 build_version = self.plist(path, 'CFBundleVersion')
@@ -127,6 +125,7 @@ class Ipa(Base):
                 app.logger.error(e)
                 pass
         return (bundle_id, display_name, build_version, app_version, error_list)
+
 
     def install_plist(self, ipa_file, hostname, bundle_id, app_version, display_name):
         '''
@@ -188,7 +187,8 @@ class Apk(Base):
         self.download_url = self.generate_download_url(url_root)
 
     def __repr__(self):
-        return '<%s(%r, %r)>' % (self.__class__.__name__, self.id, self.apk_name)
+        return '<%s(%r, %r)>' % (
+            self.__class__.__name__, self.id, self.apk_name)
 
     def remove_apk(self):
         try:

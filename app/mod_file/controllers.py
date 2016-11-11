@@ -31,8 +31,9 @@ def index(app_id=None):
         apklist = Apk.query.filter_by(app_id=app_id).order_by(
             Apk.created_at.desc()).all()
 
-    return render_template('file/index.html', error=error,
-                           app_list=applist, ipa_list=ipalist, apk_list=apklist, is_mobile=is_mobile(ua), hostname=host)
+    return render_template(
+        'file/index.html', error=error, app_list=applist, ipa_list=ipalist,
+        apk_list=apklist, is_mobile=is_mobile(ua), hostname=host)
 
 
 @mod_file.route('/<int:app_id>', methods=['POST'])
@@ -56,7 +57,12 @@ def create(app_id):
                 remove_old_ipa(app_id)
                 response = {'status': 1}
             else:
-                return jsonify({'status': 0, 'error': 'This file is not allowed(Not found ipa file)'})
+                return jsonify(
+                    {
+                        'status': 0,
+                        'error': 'This file is not allowed(Not found ipa file)'
+                    }
+                )
         elif app.platform == 'android':
             if file and allowed_apk_file(file.filename):
                 filename = secure_filename(file.filename)
@@ -70,7 +76,12 @@ def create(app_id):
                 remove_old_apk(app_id)
                 response = {'status': 1}
             else:
-                return jsonify({'status': 0, 'error': 'This file is not allowed(Not found apk file)'})
+                return jsonify(
+                    {
+                        'status': 0,
+                        'error': 'This file is not allowed(Not found apk file)'
+                    }
+                )
         else:
             return jsonify({'status': 0, 'error': 'Not found application'})
     else:
@@ -87,6 +98,7 @@ def allowed_ipa_file(filename):
     '''
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in ALLOWED_IPA_EXTENSIONS
+
 
 ALLOWED_APK_EXTENSIONS = set(['apk'])
 
@@ -111,8 +123,9 @@ def is_mobile(useragent):
 def create_app_directory():
     path = app.config['UPLOADED_IPA_DIR']
     now = datetime.now(pytz.timezone('Asia/Tokyo'))
-    dirname = '{0}-{1:0=2d}{2:0=2d}{3:0=2d}'.format(
-        now.date().__str__(), now.hour, now.minute, now.second)
+    dirname = '{0}-{1:0=2d}{2:0=2d}{3:0=2d}{4:0=6d}'.format(
+        now.date().__str__(), now.hour, now.minute,
+        now.second, now.microsecond)
     path = os.path.join(path, dirname)
     if not os.path.exists(path):
         os.makedirs(path)
