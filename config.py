@@ -15,3 +15,6 @@ UPLOADED_IPA_DIR = 'app/static/uploaded_ipa'
 
 # Path prefix
 URL_PREFIX = '/appinstaller'
+
+# Max number of saved files per an app
+MAX_FILES = 20

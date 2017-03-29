@@ -4,7 +4,7 @@
 import os
 import pytz
 
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, url_for, redirect
 from werkzeug import secure_filename
 from datetime import datetime
 
@@ -19,7 +19,7 @@ mod_file = Blueprint(
 @mod_file.route('/', methods=['GET'])
 @mod_file.route('/<int:app_id>', methods=['GET'])
 def index(app_id=None):
-    error = None
+    error = request.args.get('error', default=None)
     ua = request.headers.get('User-Agent')
     host = request.headers.get('Host')
     applist = App.query.all()
@@ -85,8 +85,31 @@ def create(app_id):
         else:
             return jsonify({'status': 0, 'error': 'Not found application'})
     else:
-        response = {'status': 0, 'error': 'This URI is GET method only.'}
+        response = {'status': 0, 'error': 'This URI is POST method only.'}
     return jsonify(response)
+
+
+@mod_file.route('/<int:app_id>/<int:file_id>', methods=['POST'])
+def keep(app_id, file_id):
+    error = None
+    app = App.query.filter_by(id=app_id).first()
+    status = request.form['status']
+    if not app:
+        error = 'Not found the application'
+
+    if app.platform == 'ios':
+        ipa = Ipa.query.filter_by(id=file_id).first()
+        if ipa is not None:
+            ipa.status = status
+            db.session.commit()
+    elif app.platform == 'android':
+        apk = Apk.query.filter_by(id=file_id).first()
+        if apk is not None:
+            apk.status = status
+            db.session.commit()
+    else:
+        error = 'Not found a file'
+    return redirect(url_for('file.index', app_id=app_id, error=error))
 
 
 ALLOWED_IPA_EXTENSIONS = set(['ipa'])
@@ -132,16 +155,21 @@ def create_app_directory():
     return path
 
 
+MAX_FILES = app.config['MAX_FILES']
+
+
 def remove_old_ipa(app_id):
-    # Remove old ipa, show latest 20
-    old_ipalist = Ipa.query.filter_by(app_id=app_id).order_by(
-        Ipa.created_at.desc()).limit(21).all()
+    # Remove old ipa, show latest MAX_FILES
+    old_ipalist = Ipa.query.filter_by(app_id=app_id, status=0).order_by(
+        Ipa.created_at.desc()).limit(MAX_FILES + 1).all()
     old_ipa = None
-    if len(old_ipalist) > 20:
+    if len(old_ipalist) > MAX_FILES:
         old_ipa = old_ipalist[-1]
     if old_ipa:
         ipalist = Ipa.query.filter(
-            Ipa.app_id == app_id, Ipa.created_at < old_ipa.created_at).all()
+            Ipa.app_id == app_id,
+            Ipa.status == 0,
+            Ipa.created_at < old_ipa.created_at).all()
         for ipa in ipalist:
             ipa.remove_ipa()
             db.session.delete(ipa)
@@ -149,15 +177,17 @@ def remove_old_ipa(app_id):
 
 
 def remove_old_apk(app_id):
-    # Remove old apk, show latest 20
-    old_apklist = Apk.query.filter_by(app_id=app_id).order_by(
-        Apk.created_at.desc()).limit(21).all()
+    # Remove old apk, show latest MAX_FILES
+    old_apklist = Apk.query.filter_by(app_id=app_id, status=0).order_by(
+        Apk.created_at.desc()).limit(MAX_FILES + 1).all()
     old_apk = None
-    if len(old_apklist) > 20:
+    if len(old_apklist) > MAX_FILES:
         old_apk = old_apklist[-1]
     if old_apk:
         apklist = Apk.query.filter(
-            Apk.app_id == app_id, Apk.created_at < old_apk.created_at).all()
+            Apk.app_id == app_id,
+            Apk.status == 0,
+            Apk.created_at < old_apk.created_at).all()
         for apk in apklist:
             apk.remove_apk()
             db.session.delete(apk)

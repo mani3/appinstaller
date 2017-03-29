@@ -62,6 +62,17 @@ $ curl -F file=@sample.ipa http://{{ hostname }}/appinstaller/file/1
     {% if not is_mobile %}
     <th><a class="btn btn-success" href="{{ ipa.ipa_uri }}" download="{{ ipa.ipa_name }}">Download</a></th>
     {% endif %}
+    <th>
+      <form action="{{ url_for('file.keep', app_id=ipa.app_id, file_id=ipa.id) }}" method="post">
+        {% if ipa.status == 0 %}
+        <input type="hidden" name="status" value="1" />
+        <button type="submit" class="btn btn-default">Keep</button>
+        {% else %}
+        <input type="hidden" name="status" value="0" />
+        <button type="submit" class="btn btn-warning">Don't Keep</button>
+        {% endif %}
+      </form>
+    </th>
   </tr>
   {% endfor %}
   {% for apk in apk_list %}
@@ -74,6 +85,17 @@ $ curl -F file=@sample.ipa http://{{ hostname }}/appinstaller/file/1
     {% if not is_mobile %}
     <th><a class="btn btn-success" href="{{ apk.download_url }}" download="{{ apk.apk_name }}">Download</a></th>
     {% endif %}
+    <th>
+      <form action="{{ url_for('file.keep', app_id=apk.app_id, file_id=apk.id) }}" method="post">
+        {% if apk.status == 0 %}
+        <input type="hidden" name="status" value="1" />
+        <button type="submit" class="btn btn-default">Keep</button>
+        {% else %}
+        <input type="hidden" name="status" value="0" />
+        <button type="submit" class="btn btn-warning">Don't Keep</button>
+        {% endif %}
+      </form>
+    </th>
   </tr>
   {% endfor %}
   </tbody>

@@ -17,6 +17,8 @@ class Base(db.Model):
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(
+        db.Integer, default=0, server_default="0", nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.localtimestamp())
     updated_at = db.Column(db.DateTime, default=db.func.localtimestamp())
 
