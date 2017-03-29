@@ -29,7 +29,8 @@ python manage.py db upgrade
 gunicorn -b 127.0.0.1:4000 app:app \
 --error-logfile "${ERROR_LOG}" \
 --access-logfile "${ACCESS_LOG}" \
---timeout 600
+--timeout 300 \
+--workers 4
 
 deactivate
 
