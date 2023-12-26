@@ -13,5 +13,5 @@ Mako==1.0.1
 MarkupSafe==0.23
 pytz==2015.4
 SQLAlchemy==1.3.0
-Werkzeug==0.10.4
+Werkzeug==2.3.8
 WTForms==2.0.2
